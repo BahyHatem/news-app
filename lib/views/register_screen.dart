@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/validation_utils.dart';
+import '../models/user_model.dart';
+import '../services/local_auth_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -19,10 +21,45 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final phoneController = TextEditingController();
   DateTime? birthDate;
 
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
+  bool isLoading = false;
+
+  Future<void> _submitForm() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final birthError = AuthValidator.validateAge(birthDate);
+    if (birthError != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Registration Successful ✅")),
+        SnackBar(content: Text(birthError)),
+      );
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    final newUser = UserModel(
+      id: '', 
+      firstName: firstNameController.text.trim(),
+      lastName: lastNameController.text.trim(),
+      email: emailController.text.trim(),
+      passwordHash: passwordController.text.trim(), 
+      phoneNumber: phoneController.text.trim(),
+      dateOfBirth: birthDate  ?? DateTime(1900),
+      salt: '', 
+      createdAt: DateTime.now(), 
+    );
+
+    final success = await LocalAuthService().register(newUser);
+
+    setState(() => isLoading = false);
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Registration Successful ")),
+      );
+      
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Email already exists")),
       );
     }
   }
@@ -36,16 +73,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
 
     if (picked != null) {
-      setState(() {
-        birthDate = picked;
-      });
+      setState(() => birthDate = picked);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Register")),
+      appBar: AppBar(title: Text("Register"),
+      centerTitle: true,
+      backgroundColor: Colors.amber[100]),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -100,7 +137,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ListTile(
                 title: Text(birthDate == null
                     ? "Select Date of Birth"
-                    : "DB: ${birthDate!.toLocal().toString().split(' ')[0]}"),
+                    : "DOB: ${birthDate!.toLocal().toString().split(' ')[0]}"),
                 trailing: Icon(Icons.calendar_today),
                 onTap: _pickBirthDate,
               ),
@@ -115,19 +152,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   },
                 ),
               const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () {
-                  final birthError = AuthValidator.validateAge(birthDate);
-                  if (birthError != null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(birthError)),
-                    );
-                    return;
-                  }
-                  _submitForm();
-                },
-                child: Text("Register"),
-              ),
+              isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : ElevatedButton(
+                      onPressed: _submitForm,
+                      child: Text("Register"),
+                    ),
             ],
           ),
         ),

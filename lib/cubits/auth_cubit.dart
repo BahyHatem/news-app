@@ -1,90 +1,66 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
+import '../services/local_auth_service.dart';
 import '../cubits/auth_state.dart';
 
+
+
 class AuthCubit extends Cubit<AuthState> {
-  AuthCubit() : super(AuthInitial());
+  final LocalAuthService _authService;
+
+  AuthCubit(this._authService) : super(AuthInitial());
 
   Future<void> login(String email, String password, bool rememberMe) async {
     emit(AuthLoading());
-    await Future.delayed(Duration(seconds: 1));
-    if (email == "bahy@example.com" && password == "12345678") {
-      final user = UserModel(
-        id: '1',
-        firstName: 'bahy',
-        lastName: 'hatem',
-        email: email,
-        passwordHash: 'hashed_password',
-        createdAt: DateTime.now(),
-      );
-
-      if (rememberMe) {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('userEmail', user.email);
+    try {
+      final user = await _authService.login(email, password);
+      if (user != null) {
+        emit(AuthAuthenticated(user));
+      } else {
+        emit(AuthError("Invalid email or password"));
       }
-
-      emit(AuthAuthenticated(user));
-    } else {
-      emit(AuthError("Invalid email or password."));
+    } catch (e) {
+      emit(AuthError("Login failed: ${e.toString()}"));
     }
   }
 
-  Future<void> register(UserModel newUser) async {
+  Future<void> register(UserModel user) async {
     emit(AuthLoading());
-
-    await Future.delayed(Duration(seconds: 1));
-    emit(AuthAuthenticated(newUser));
+    try {
+      final result = await _authService.register(user);
+      if (result) {
+        emit(AuthRegistered());
+      } else {
+        emit(AuthError("User already exists"));
+      }
+    } catch (e) {
+      emit(AuthError("Registration failed: ${e.toString()}"));
+    }
   }
 
   Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('userEmail');
+    await _authService.logout();
     emit(AuthInitial());
   }
 
   Future<void> checkAuthStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedEmail = prefs.getString('userEmail');
-
-    if (savedEmail != null) {
-      final user = UserModel(
-        id: '1',
-        firstName: 'bahy',
-        lastName: 'hatem',
-        email: savedEmail,
-        passwordHash: 'hashed_password',
-        createdAt: DateTime.now(),
-      );
+    final user = await _authService.getCurrentUser();
+    if (user != null) {
       emit(AuthAuthenticated(user));
     } else {
       emit(AuthInitial());
     }
   }
 
-  void validateForm(Map<String, String> formData) {
-    if (formData['email'] == null || !formData['email']!.contains('@')) {
-      emit(AuthFormInvalid("Invalid email format"));
-      return;
-    }
-    if (formData['password'] == null || formData['password']!.length < 8) {
-      emit(AuthFormInvalid("Password too short"));
-      return;
-    }
-    emit(AuthFormValid());
-  }
-
-  void updateProfile(UserModel updatedUser) {
-    emit(AuthAuthenticated(updatedUser)); 
-  }
-
-  void changePassword(String oldPass, String newPass) {
-    if (oldPass == newPass) {
-      emit(AuthError("New password must be different"));
-    } else if (newPass.length < 6) {
-      emit(AuthError("New password too short"));
-    } else {
-      emit(AuthPasswordChanged());
+  Future<void> updateProfile(UserModel updatedUser) async {
+    try {
+      final result = await _authService.updateProfile(updatedUser);
+      if (result) {
+        emit(AuthAuthenticated(updatedUser));
+      } else {
+        emit(AuthError("Failed to update profile"));
+      }
+    } catch (e) {emit(AuthError("Password change failed: ${e.toString()}"));
     }
   }
 }
