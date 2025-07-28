@@ -67,6 +67,12 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: Text('login',
+      style: TextStyle(color: Colors.white)),
+      centerTitle: true,
+      backgroundColor: const Color.fromARGB(255, 179, 202, 255),
+      
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
         child: Column(
@@ -75,9 +81,13 @@ class _LoginScreenState extends State<LoginScreen> {
             Center(
               child: Column(
                 children: [
-                  const FlutterLogo(size: 80),
                   const SizedBox(height: 16),
-                  Text("Welcome Back", style: Theme.of(context).textTheme.headlineMedium),
+                  Text("Welcome ", 
+                  style:TextStyle(fontWeight:FontWeight.bold,
+                  color: Colors.blueAccent,
+                  fontSize: 50),
+                
+                  ),
                 ],
               ),
             ),
