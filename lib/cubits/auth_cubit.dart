@@ -1,15 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../models/user_model.dart';
 import '../services/local_auth_service.dart';
-import '../cubits/auth_state.dart';
-
-
+import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final LocalAuthService _authService;
 
   AuthCubit(this._authService) : super(AuthInitial());
 
+  
   Future<void> login(String email, String password, bool rememberMe) async {
     emit(AuthLoading());
     try {
@@ -60,7 +59,36 @@ class AuthCubit extends Cubit<AuthState> {
       } else {
         emit(AuthError("Failed to update profile"));
       }
-    } catch (e) {emit(AuthError("Password change failed: ${e.toString()}"));
+    } catch (e) {
+      emit(AuthError("Profile update failed: ${e.toString()}"));
     }
   }
-}
+
+  Future<void> loadSecurityQuestion(String email) async {
+    emit(AuthLoading());
+    try {
+      final question = await _authService.getSecurityQuestion(email);
+      if (question != null) {
+        emit(AuthSecurityQuestionLoaded(question, email));
+      } else {
+        emit(AuthError("Email not found"));
+      }
+    } catch (e) {
+      emit(AuthError("Failed to load security question: ${e.toString()}"));
+    }
+  }
+
+  Future<void> verifySecurityAnswer(String email, String answer) async {
+    emit(AuthLoading());
+    try {
+      final user = await _authService.verifySecurityAnswer(email, answer);
+      if (user != null) {
+        emit(AuthSecurityQuestionVerified(user));
+      } else {
+        emit(AuthError("Incorrect answer"));
+      }
+    } catch (e) {
+      emit(AuthError("Verification failed: ${e.toString()}"));
+    }
+  } 
+  }

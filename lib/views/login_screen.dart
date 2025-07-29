@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../views/forget_password_screen.dart';
+import '../views/register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -39,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isLoading = true);
 
-    // Simulate checking email/password (Replace with real logic)
+  
     await Future.delayed(const Duration(seconds: 2));
 
     if (_emailController.text == 'user@example.com' && _passwordController.text == 'password123') {
@@ -51,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
         await prefs.remove('remembered_email');
         await prefs.setBool('remember_me', false);
       }
-      // Navigate to Home (placeholder)
+      
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Login successful!')),
       );
@@ -70,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
       appBar: AppBar(title: Text('login',
       style: TextStyle(color: Colors.white)),
       centerTitle: true,
-      backgroundColor: const Color.fromARGB(255, 179, 202, 255),
+      backgroundColor: Colors.blueAccent,
       
       ),
       body: SingleChildScrollView(
@@ -133,9 +135,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       const Text("Remember Me"),
                       const Spacer(),
                       TextButton(
-                        onPressed: () {},
-                        child: const Text("Forgot Password?"),
-                      ),
+                        onPressed: () {
+                           Navigator.push(context, MaterialPageRoute(builder: (_) => ForgotPasswordScreen()));
+                          },
+                            child: Text("Forgot Password?"),
+                       ),
+
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -154,15 +159,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       const Text("Don't have an account?"),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (_) =>  RegisterScreen ()));
+                        },
                         child: const Text("Register"),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  const Divider(),
-                  const SizedBox(height: 16),
-                  const Text("Social Login coming soon...", textAlign: TextAlign.center),
+                  
                 ],
               ),
             ),

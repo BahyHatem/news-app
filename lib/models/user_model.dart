@@ -9,7 +9,9 @@ class UserModel {
   final String? profileImage;
   final DateTime createdAt;
   final DateTime? lastLoginAt;
-  final String salt; // 🔐 NEW
+  final String salt;
+  final String securityQuestion;
+  final String securityAnswer;
 
   UserModel({
     required this.id,
@@ -19,6 +21,8 @@ class UserModel {
     required this.passwordHash,
     required this.createdAt,
     required this.salt,
+    required this.securityQuestion,
+    required this.securityAnswer,
     this.phoneNumber,
     this.dateOfBirth,
     this.profileImage,
@@ -32,7 +36,9 @@ class UserModel {
       lastName: json['lastName'],
       email: json['email'],
       passwordHash: json['passwordHash'],
-      salt: json['salt'], // 🆕
+      salt: json['salt'],
+      securityQuestion: json['securityQuestion'],
+      securityAnswer: json['securityAnswer'],
       phoneNumber: json['phoneNumber'],
       dateOfBirth: json['dateOfBirth'] != null ? DateTime.parse(json['dateOfBirth']) : null,
       profileImage: json['profileImage'],
@@ -48,7 +54,9 @@ class UserModel {
       'lastName': lastName,
       'email': email,
       'passwordHash': passwordHash,
-      'salt': salt, // 🆕
+      'salt': salt,
+      'securityQuestion': securityQuestion,
+      'securityAnswer': securityAnswer,
       'phoneNumber': phoneNumber,
       'dateOfBirth': dateOfBirth?.toIso8601String(),
       'profileImage': profileImage,
@@ -69,6 +77,8 @@ class UserModel {
     DateTime? createdAt,
     DateTime? lastLoginAt,
     String? salt,
+    String? securityQuestion,
+    String? securityAnswer,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -77,6 +87,8 @@ class UserModel {
       email: email ?? this.email,
       passwordHash: passwordHash ?? this.passwordHash,
       salt: salt ?? this.salt,
+      securityQuestion: securityQuestion ?? this.securityQuestion,
+      securityAnswer: securityAnswer ?? this.securityAnswer,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
       profileImage: profileImage ?? this.profileImage,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../utils/validation_utils.dart';
 import '../models/user_model.dart';
 import '../services/local_auth_service.dart';
+import '../views/login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -12,40 +13,65 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
-
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
   final phoneController = TextEditingController();
+  final securityAnswerController = TextEditingController();
   DateTime? birthDate;
 
+  String? selectedSecurityQuestion;
   bool isLoading = false;
 
+  final List<String> securityQuestions = [
+    "What's your mother's maiden name?",
+    "What was your first pet's name?",
+    "What city were you born in?",
+  ];
+
   Future<void> _submitForm() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      _focusFirstInvalidField();
+      return;
+    }
 
     final birthError = AuthValidator.validateAge(birthDate);
     if (birthError != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(birthError)),
-      );
+      _showSnackBar(birthError, isError: true);
+      return;
+    }
+
+    if (selectedSecurityQuestion == null) {
+      _showSnackBar("Please select a security question", isError: true);
+      return;
+    }
+
+    if (securityAnswerController.text.trim().isEmpty) {
+      _showSnackBar("Please provide an answer to your security question", isError: true);
       return;
     }
 
     setState(() => isLoading = true);
 
+    // 🔐 Generate salt and hash password
+    final authService = LocalAuthService();
+final salt = authService.generateSalt();
+final hashedPassword = authService.hashPassword(passwordController.text.trim(), salt);
+
     final newUser = UserModel(
-      id: '', 
+      id: '',
       firstName: firstNameController.text.trim(),
       lastName: lastNameController.text.trim(),
       email: emailController.text.trim(),
-      passwordHash: passwordController.text.trim(), 
+      passwordHash: hashedPassword,
       phoneNumber: phoneController.text.trim(),
-      dateOfBirth: birthDate  ?? DateTime(1900),
-      salt: '', 
-      createdAt: DateTime.now(), 
+      dateOfBirth: birthDate ?? DateTime(1900),
+      salt: salt,
+      createdAt: DateTime.now(),
+      securityQuestion: selectedSecurityQuestion!,
+      securityAnswer: securityAnswerController.text.trim(),
     );
 
     final success = await LocalAuthService().register(newUser);
@@ -53,14 +79,53 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => isLoading = false);
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Registration Successful ")),
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text("Success"),
+          content: Text("Registration completed successfully."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (_) => LoginScreen()),
+                );
+              },
+              child: Text("OK"),
+            ),
+          ],
+        ),
       );
-      
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Email already exists")),
-      );
+      _showSnackBar("Email already exists", isError: true);
+    }
+  }
+
+  void _showSnackBar(String message, {bool isError = false}) {
+    final color = isError ? Colors.red : Colors.green;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: color,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _focusFirstInvalidField() {
+    final fields = [
+      firstNameController,
+      lastNameController,
+      emailController,
+      passwordController,
+      confirmPasswordController,
+    ];
+    for (final controller in fields) {
+      if (controller.text.trim().isEmpty) {
+        FocusScope.of(context).requestFocus(FocusNode());
+        break;
+      }
     }
   }
 
@@ -71,7 +136,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
-
     if (picked != null) {
       setState(() => birthDate = picked);
     }
@@ -80,9 +144,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Register"),
-      centerTitle: true,
-      backgroundColor: const Color.fromARGB(255, 179, 202, 255)),
+      appBar: AppBar(
+        title: Text("Register", style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.blueAccent,
+        centerTitle: true,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -94,27 +160,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 decoration: InputDecoration(labelText: "First Name"),
                 validator: AuthValidator.validateName,
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 16),
               TextFormField(
                 controller: lastNameController,
                 decoration: InputDecoration(labelText: "Last Name"),
                 validator: AuthValidator.validateName,
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 16),
               TextFormField(
                 controller: emailController,
                 decoration: InputDecoration(labelText: "Email"),
                 keyboardType: TextInputType.emailAddress,
                 validator: AuthValidator.validateEmail,
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 16),
               TextFormField(
                 controller: passwordController,
                 decoration: InputDecoration(labelText: "Password"),
                 obscureText: true,
                 validator: AuthValidator.validatePassword,
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 16),
               TextFormField(
                 controller: confirmPasswordController,
                 decoration: InputDecoration(labelText: "Confirm Password"),
@@ -126,14 +192,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 16),
               TextFormField(
                 controller: phoneController,
                 decoration: InputDecoration(labelText: "Phone (optional)"),
                 keyboardType: TextInputType.phone,
                 validator: AuthValidator.validatePhone,
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               ListTile(
                 title: Text(birthDate == null
                     ? "Select Date of Birth"
@@ -141,17 +207,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 trailing: Icon(Icons.calendar_today),
                 onTap: _pickBirthDate,
               ),
-              if (birthDate != null)
-                Builder(
-                  builder: (context) {
-                    final result = AuthValidator.validateAge(birthDate);
-                    return result != null
-                        ? Text(result,
-                            style: TextStyle(color: Colors.red, fontSize: 12))
-                        : SizedBox.shrink();
-                  },
-                ),
-              const SizedBox(height: 24),
+              SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: selectedSecurityQuestion,
+                decoration: InputDecoration(labelText: "Security Question"),
+                items: securityQuestions
+                    .map((q) => DropdownMenuItem(value: q, child: Text(q)))
+                    .toList(),
+                onChanged: (value) => setState(() => selectedSecurityQuestion = value),
+                validator: (value) =>
+                    value == null ? "Please select a question" : null,
+              ),
+              SizedBox(height: 16),
+              TextFormField(
+                controller: securityAnswerController,
+                decoration: InputDecoration(labelText: "Answer"),
+                validator: (value) =>
+                    value == null || value.trim().isEmpty ? "Enter your answer" : null,
+              ),
+              SizedBox(height: 24),
               isLoading
                   ? Center(child: CircularProgressIndicator())
                   : ElevatedButton(

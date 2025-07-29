@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
           border: OutlineInputBorder(),
         ),
       ),
-      home: const LoginScreen(),
+      home:  LoginScreen(),
     );
   }
 }
