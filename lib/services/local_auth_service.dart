@@ -23,15 +23,20 @@ class LocalAuthService {
   }
 
   String hashPassword(String password, String salt) {
-    final bytes = utf8.encode(password + salt);
-    return sha256.convert(bytes).toString();
-  }
+  final bytes = utf8.encode(password + salt);
+  final digest = sha256.convert(bytes);
+  return digest.toString();
+}
 
-  Future<List<UserModel>> _getAllUsers() async {
-    final prefs = await SharedPreferences.getInstance();
-    final jsonList = prefs.getStringList(usersKey) ?? [];
-    return jsonList.map((jsonUser) => UserModel.fromJson(json.decode(jsonUser))).toList();
-  }
+  Future<List<UserModel>> getAllUsers() async {
+  final prefs = await SharedPreferences.getInstance();
+  final usersData = prefs.getStringList('users_list') ?? [];
+  return usersData.map((jsonString) {
+    final map = jsonDecode(jsonString);
+    return UserModel.fromJson(map);
+  }).toList();
+}
+
 
   Future<void> _saveAllUsers(List<UserModel> users) async {
     final prefs = await SharedPreferences.getInstance();
@@ -39,32 +44,26 @@ class LocalAuthService {
     await prefs.setStringList(usersKey, jsonList);
   }
 
-  Future<bool> register(UserModel user) async {
-    final users = await _getAllUsers();
-    if (users.any((u) => u.email == user.email)) return false;
+  Future<bool> register(UserModel newUser) async {
+  final prefs = await SharedPreferences.getInstance();
+  final usersData = prefs.getStringList('users_list') ?? [];
 
-    final salt = generateSalt();
-    final hashedPassword = hashPassword(user.passwordHash, salt);
+  final existing = usersData.any((jsonString) {
+    final userMap = jsonDecode(jsonString);
+    return userMap['email'] == newUser.email;
+  });
 
-    final newUser = user.copyWith(
-      id: _uuid.v4(),
-      salt: salt,
-      passwordHash: hashedPassword,
-      createdAt: DateTime.now(),
-    );
+  if (existing) return false;
 
-    users.add(newUser);
-    await _saveAllUsers(users);
+  final userJson = jsonEncode(newUser.toJson());
+  usersData.add(userJson);
+  await prefs.setStringList('users_list', usersData);
+  return true;
+}
 
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(currentUserIdKey, newUser.id);
-    await prefs.setString(sessionKey, DateTime.now().toIso8601String());
-
-    return true;
-  }
 
   Future<UserModel?> login(String email, String password, {bool rememberMe = false}) async {
-    final users = await _getAllUsers();
+    final users = await getAllUsers();
     final user = users.where((u) => u.email == email).isNotEmpty
         ? users.firstWhere((u) => u.email == email)
         : null;
@@ -90,12 +89,12 @@ class LocalAuthService {
   }
 
   Future<bool> isUserExists(String email) async {
-    final users = await _getAllUsers();
+    final users = await getAllUsers();
     return users.any((u) => u.email == email);
   }
 
   Future<UserModel?> getUserByEmail(String email) async {
-    final users = await _getAllUsers();
+    final users = await getAllUsers();
     try {
       return users.firstWhere((u) => u.email == email);
     } catch (_) {
@@ -120,7 +119,7 @@ class LocalAuthService {
   required String email,
   required String newPassword,
 }) async {
-  final users = await _getAllUsers();
+  final users = await getAllUsers();
   final index = users.indexWhere((u) => u.email == email);
   if (index == -1) return false;
 
@@ -138,7 +137,7 @@ class LocalAuthService {
     final userId = prefs.getString(currentUserIdKey);
     if (userId == null) return null;
 
-    final users = await _getAllUsers();
+    final users = await getAllUsers();
     try {
       return users.firstWhere((u) => u.id == userId);
     } catch (_) {
@@ -147,7 +146,7 @@ class LocalAuthService {
   }
 
   Future<bool> updateProfile(UserModel updatedUser) async {
-    final users = await _getAllUsers();
+    final users = await getAllUsers();
     final index = users.indexWhere((u) => u.id == updatedUser.id);
     if (index == -1) return false;
 
@@ -157,7 +156,7 @@ class LocalAuthService {
   }
 
   Future<bool> changePassword(String userId, String oldPass, String newPass) async {
-    final users = await _getAllUsers();
+    final users = await getAllUsers();
     final index = users.indexWhere((u) => u.id == userId);
     if (index == -1) return false;
 
@@ -183,7 +182,7 @@ class LocalAuthService {
     required String answer,
     required String newPassword,
   }) async {
-    final users = await _getAllUsers();
+    final users = await getAllUsers();
     final index = users.indexWhere((u) => u.email == email);
     if (index == -1) return false;
 
@@ -217,4 +216,11 @@ class LocalAuthService {
     final lastLogin = DateTime.parse(lastLoginStr);
     return DateTime.now().difference(lastLogin) < timeout;
   }
+  bool verifyPassword(String enteredPassword, String storedHash, String salt) {
+  final hashedInput = hashPassword(enteredPassword, salt);
+  return hashedInput == storedHash;
+}
+
+
+
 }

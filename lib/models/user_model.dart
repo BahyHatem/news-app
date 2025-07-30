@@ -28,6 +28,21 @@ class UserModel {
     this.profileImage,
     this.lastLoginAt,
   });
+  factory UserModel.empty() {
+    return UserModel(
+      id: '',
+      firstName: '',
+      lastName: '',
+      email: '',
+      passwordHash: '',
+      phoneNumber: '',
+      dateOfBirth: DateTime(1900),
+      salt: '',
+      createdAt: DateTime(1900),
+      securityQuestion: '',
+      securityAnswer: '',
+    );
+  }
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(

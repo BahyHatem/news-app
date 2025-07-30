@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../views/forget_password_screen.dart';
 import '../views/register_screen.dart';
+import '../models/user_model.dart';
+import '../services/local_auth_service.dart';
+import '../views/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -37,34 +40,51 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _login() async {
-    if (!_formKey.currentState!.validate()) return;
+  if (!_formKey.currentState!.validate()) return;
 
-    setState(() => _isLoading = true);
+  setState(() => _isLoading = true);
+
+  final authService = LocalAuthService();
+  final users = await authService.getAllUsers();
+
+  final enteredEmail = _emailController.text.trim();
+  final enteredPassword = _passwordController.text;
 
   
-    await Future.delayed(const Duration(seconds: 2));
+  final user = users.firstWhere(
+    (u) => u.email == enteredEmail,
+    orElse: () => UserModel.empty(),
+  );
 
-    if (_emailController.text == 'user@example.com' && _passwordController.text == 'password123') {
-      final prefs = await SharedPreferences.getInstance();
-      if (_rememberMe) {
-        await prefs.setString('remembered_email', _emailController.text);
-        await prefs.setBool('remember_me', true);
-      } else {
-        await prefs.remove('remembered_email');
-        await prefs.setBool('remember_me', false);
-      }
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login successful!')),
-      );
+  final isValidUser = user.email.isNotEmpty &&
+      authService.verifyPassword(enteredPassword, user.passwordHash, user.salt);
+
+  if (isValidUser) {
+    final prefs = await SharedPreferences.getInstance();
+    if (_rememberMe) {
+      await prefs.setString('remembered_email', enteredEmail);
+      await prefs.setBool('remember_me', true);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid email or password')),
-      );
+      await prefs.remove('remembered_email');
+      await prefs.setBool('remember_me', false);
     }
 
-    setState(() => _isLoading = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Login successful!')),
+    );
+
+   Navigator.of(context).pushReplacement(
+  MaterialPageRoute(builder: (_) => HomeScreen(currentUser: user)),
+);
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Invalid email or password')),
+    );
   }
+
+  setState(() => _isLoading = false);
+}
+
 
   @override
   Widget build(BuildContext context) {
