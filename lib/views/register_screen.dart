@@ -55,7 +55,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     setState(() => isLoading = true);
 
-    // 🔐 Generate salt and hash password
+    
     final authService = LocalAuthService();
 final salt = authService.generateSalt();
 final hashedPassword = authService.hashPassword(passwordController.text.trim(), salt);
