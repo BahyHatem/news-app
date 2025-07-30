@@ -27,7 +27,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _saveProfile() {
     if (_formKey.currentState!.validate()) {
-      // حفظ البيانات
+      
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Profile saved")),
       );

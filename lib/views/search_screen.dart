@@ -60,12 +60,12 @@ class _ArticleSearchScreenState extends State<ArticleSearchScreen> {
 
   List<Article> filteredArticles = [];
   String searchQuery = '';
-  String searchCategory = 'title'; // or 'description'
+  String searchCategory = 'title'; 
 
   @override
   void initState() {
     super.initState();
-    filteredArticles = allArticles; // initial list
+    filteredArticles = allArticles; 
   }
 
   void _filterArticles() {
@@ -90,7 +90,7 @@ class _ArticleSearchScreenState extends State<ArticleSearchScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // 🔍 حقل البحث
+            
             TextField(
               decoration: InputDecoration(
                 hintText: 'Search articles...',
@@ -114,7 +114,7 @@ class _ArticleSearchScreenState extends State<ArticleSearchScreen> {
             ),
             const SizedBox(height: 8),
 
-            // 📁 اختيار نوع البحث
+           
             Row(
               children: [
                 const Text('Search in:'),
@@ -138,7 +138,7 @@ class _ArticleSearchScreenState extends State<ArticleSearchScreen> {
             ),
             const SizedBox(height: 12),
 
-            // 📄 عرض النتائج
+            
             Expanded(
               child: filteredArticles.isEmpty
                   ? const Center(child: Text('No results found.'))

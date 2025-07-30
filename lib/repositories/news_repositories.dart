@@ -15,12 +15,12 @@ class NewsRepository {
   final Dio _dio;
    String _bookmarksKey = 'bookmarked_articles';
 
-  // Cache durations
+  
   static const Duration _headlineCacheDuration = Duration(minutes: 30);
   static const Duration _searchCacheDuration = Duration(minutes: 60);
   static const Duration _debounceDuration = Duration(milliseconds: 500);
 
-  // Timer for search debouncing
+  
   Timer? _searchDebounceTimer;
 
   NewsRepository({
@@ -32,7 +32,7 @@ class NewsRepository {
         _prefs = prefs,
         _dio = dio;
 
-  // 1. Get Top Headlines with Cache Fallback
+  
   Future<List<Article>> getTopHeadlines({
     String country = 'us',
     bool forceRefresh = false,
@@ -40,24 +40,24 @@ class NewsRepository {
     final cacheKey = 'headlines_$country';
     
     try {
-      // Return cached data if available and not forcing refresh
+      
       if (!forceRefresh) {
-        final cached = await _getCachedArticles(cacheKey); // Added await
+        final cached = await _getCachedArticles(cacheKey); 
         if (cached != null) return cached;
       }
 
-      // Fetch from API
+     
       final response = await _apiService.getTopHeadlines(country: country);
       final articles = (response['articles'] as List)
           .map((json) => Article.fromJson(json))
           .toList();
 
-      // Cache the results
+      
       await _cacheArticles(cacheKey, articles, _headlineCacheDuration);
       return articles;
     } catch (e) {
       foundation.debugPrint('API Error: $e');
-      // Fallback to cache if available
+      
       final cached = await _getCachedArticles(cacheKey); 
       if (cached != null) return cached;
       rethrow;

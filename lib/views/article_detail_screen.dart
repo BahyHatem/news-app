@@ -12,7 +12,7 @@ class ArticleDetailScreen extends StatelessWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // Hero AppBar with Image
+          
           SliverAppBar(
             pinned: true,
             expandedHeight: 250.0,
@@ -40,14 +40,14 @@ class ArticleDetailScreen extends StatelessWidget {
             ),
           ),
 
-          // Article Content
+          
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Title
+                  
                   Text(
                     article.title,
                     style: Theme.of(context).textTheme.headlineSmall,
@@ -55,7 +55,7 @@ class ArticleDetailScreen extends StatelessWidget {
 
                   const SizedBox(height: 8),
 
-                  // Metadata
+                  
                   Row(
                     children: [
                       Icon(Icons.person, size: 16),
@@ -70,7 +70,7 @@ class ArticleDetailScreen extends StatelessWidget {
 
                   const Divider(height: 32),
 
-                  // Content
+                  
                   Text(
                     article.content,
                     style: Theme.of(context).textTheme.bodyMedium,
@@ -78,7 +78,7 @@ class ArticleDetailScreen extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  // Source
+                  
                   Row(
                     children: [
                       const Icon(Icons.public, size: 16),

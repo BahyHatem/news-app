@@ -23,7 +23,7 @@ class NewsAPIService {
       headers: {'X-Api-Key': _apiKey},
     ));
 
-    // Add interceptors
+    
     _dio.interceptors.addAll([
       _CacheInterceptor(_prefs),
       RetryInterceptor(dio: _dio),
@@ -32,7 +32,7 @@ class NewsAPIService {
     ]);
   }
 
-  // 1. Get Top Headlines
+  
   Future<Map<String, dynamic>> getTopHeadlines({
     String country = 'us',
     int page = 1,
@@ -60,10 +60,10 @@ class NewsAPIService {
     }
   }
 
-  // [Other methods follow the same pattern...]
+ 
   Future<Map<String, dynamic>> searchNews({
   required String query,
-  CancelToken? cancelToken, // ← أضف هذا
+  CancelToken? cancelToken, 
 }) async {
   final response = await _dio.get(
     '$_baseUrl/everything',
@@ -71,7 +71,7 @@ class NewsAPIService {
       'q': query,
       'apiKey': _apiKey,
     },
-    cancelToken: cancelToken, // ← مرّره هنا
+    cancelToken: cancelToken, 
   );
   return response.data;
 }
@@ -87,7 +87,7 @@ Future<Map<String, dynamic>> getNewsByCategory({
       'category': category,
       'page': page,
       'pageSize': pageSize,
-      'country': 'us', // أو اجعلها باراميتر إذا أردت
+      'country': 'us', 
       'apiKey': _apiKey,
     },
   );
@@ -96,7 +96,7 @@ Future<Map<String, dynamic>> getNewsByCategory({
 
 }
 
-// Cache Interceptor
+
 class _CacheInterceptor extends Interceptor {
   final SharedPreferences _prefs;
 
@@ -123,7 +123,7 @@ class _CacheInterceptor extends Interceptor {
               data: decoded['data'],
               statusCode: 200,
             ),
-            true, // Return cached response immediately
+            true, 
           );
         }
         await _prefs.remove(cacheKey);
@@ -151,7 +151,7 @@ class _CacheInterceptor extends Interceptor {
   }
 }
 
-// Retry Interceptor
+
 class RetryInterceptor extends Interceptor {
   final Dio dio;
   final int maxRetries;
@@ -166,31 +166,31 @@ class RetryInterceptor extends Interceptor {
     DioException err,
     ErrorInterceptorHandler handler,
   ) async {
-    // Get current retry count from extra
+    
     final extra = err.requestOptions.extra;
     final retryCount = (extra['retryCount'] as int?) ?? 0;
     
     if (_shouldRetry(err) && retryCount < maxRetries) {
-      // Calculate delay with exponential backoff
+      
       final delay = Duration(seconds: 1 * (retryCount + 1));
       await Future.delayed(delay);
       
-      // Update retry count
+      
       err.requestOptions.extra['retryCount'] = retryCount + 1;
       
       try {
-        // Retry the request
+        
         final response = await dio.fetch(err.requestOptions);
         handler.resolve(response);
         return;
       } catch (e) {
-        // If retry fails, continue with the error
+        
         handler.next(err);
         return;
       }
     }
     
-    // No more retries, continue with the error
+    
     handler.next(err);
   }
 
@@ -202,7 +202,7 @@ class RetryInterceptor extends Interceptor {
   }
 }
 
-// Error Interceptor
+
 class _ErrorInterceptor extends Interceptor {
   @override
   Future<void> onError(
@@ -218,7 +218,7 @@ class _ErrorInterceptor extends Interceptor {
   }
 }
 
-// Extension for retry count
+
 extension RequestOptionsX on RequestOptions {
   static const _retryCountKey = 'retryCount';
 

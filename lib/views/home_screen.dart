@@ -61,8 +61,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   PreferredSizeWidget _buildAppBar(UserModel user) {
     final greeting = _getGreeting();
-    final unreadNotifications = 3; // ديناميكي لاحقاً
-    final isOnline = true; // ديناميكي لاحقاً
+    final unreadNotifications = 3; 
+    final isOnline = true; 
 
     return AppBar(
       leading: Builder(
@@ -111,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
             IconButton(
               icon: const Icon(Icons.notifications),
               onPressed: () {
-                // شاشة الإشعارات
+                
               },
             ),
             if (unreadNotifications > 0)
@@ -213,7 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   onSelected: (_) {
                     setState(() {
                       selectedCategory = category;
-                      // كود تحميل الأخبار للفئة الجديدة هنا
+                      
                     });
                   },
                   labelStyle: TextStyle(

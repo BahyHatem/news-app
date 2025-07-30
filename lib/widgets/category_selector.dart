@@ -14,7 +14,7 @@ class CategorySelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final categories = Category.defaultCategories(); // أو حسب ما عندك
+    final categories = Category.defaultCategories(); 
     return SizedBox(
       height: 60,
       child: ListView.separated(

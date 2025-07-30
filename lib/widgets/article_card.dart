@@ -39,7 +39,7 @@ class NewsCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Article Image with Hero
+            
            
 
 Hero(
@@ -69,7 +69,7 @@ Hero(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Title (max 2 lines)
+                  
                   Text(
                     article.title,
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
@@ -78,7 +78,7 @@ Hero(
                   ),
                   const SizedBox(height: 6),
 
-                  // Source and time
+                  
                   Row(
                     children: [
                       Text(article.source, style: const TextStyle(color: Colors.grey)),
@@ -89,7 +89,7 @@ Hero(
 
                   const SizedBox(height: 8),
 
-                  // Short Description
+                  
                   Text(
                     article.description ?? '',
                     maxLines: 3,
@@ -99,11 +99,11 @@ Hero(
 
                   const SizedBox(height: 12),
 
-                  // Bottom actions: Category chip + reading time + bookmark + share
+                  
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Left side: category + reading time
+                      
                       Row(
                         children: [
                           Chip(
@@ -115,7 +115,7 @@ Hero(
                         ],
                       ),
 
-                      // Right side: bookmark + share
+                      
                       Row(
                         children: [
                           IconButton(

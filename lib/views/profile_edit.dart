@@ -31,7 +31,7 @@ class _EditableProfileScreenState extends State<EditableProfileScreen> {
       final fileSize = await file.length();
 
       if (fileSize > 2 * 1024 * 1024) {
-        // أكبر من 2MB
+        
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Image must be under 2MB")),
         );
@@ -57,7 +57,7 @@ class _EditableProfileScreenState extends State<EditableProfileScreen> {
   }
 
   bool _isValidPhone(String phone) {
-    final pattern = RegExp(r'^01[0-2,5][0-9]{8}$'); // مصري
+    final pattern = RegExp(r'^01[0-2,5][0-9]{8}$'); 
     return pattern.hasMatch(phone);
   }
 
