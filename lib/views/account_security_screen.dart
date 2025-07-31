@@ -55,12 +55,12 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
     setState(() => _isLoading = false);
 
     if (success) {
-      await _authService.logout(); // logout from all sessions
+      await _authService.logout(); 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Password changed successfully. Please log in again.")),
         );
-        Navigator.of(context).pop(); // or redirect to login
+        Navigator.of(context).pop(); 
       }
     } else {
       setState(() {
