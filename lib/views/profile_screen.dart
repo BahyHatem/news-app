@@ -49,7 +49,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   radius: 60,
                   backgroundImage: _image != null
                       ? FileImage(_image!)
-                      : const AssetImage("assets/default_avatar.png") as ImageProvider,
+                      : const AssetImage("assets/jhon.jpg") as ImageProvider,
                 ),
                 IconButton(
                   icon: const Icon(Icons.edit, color: Colors.blue),

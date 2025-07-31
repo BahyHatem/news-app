@@ -13,16 +13,16 @@ class EditableProfileScreen extends StatefulWidget {
 class _EditableProfileScreenState extends State<EditableProfileScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  final _firstNameController = TextEditingController(text: "Bahy");
-  final _lastNameController = TextEditingController(text: "Hatem");
-  final _phoneController = TextEditingController(text: "01234567890");
-  final _emailController = TextEditingController(text: "bahy@example.com");
+  final _firstNameController = TextEditingController(text: "John ");
+  final _lastNameController = TextEditingController(text: "Doe");
+  final _phoneController = TextEditingController(text: "+201234567890");
+  final _emailController = TextEditingController(text: "john@example.com");
 
   DateTime? _selectedDate;
   File? _image;
   final picker = ImagePicker();
 
-  final Set<String> _usedEmails = {"test@example.com", "bahy@example.com"}; // fake check
+  final Set<String> _usedEmails = {"test@example.com", "john@example.com"}; // fake check
 
   Future<void> _pickImage() async {
     final picked = await picker.pickImage(source: ImageSource.gallery);
@@ -92,7 +92,7 @@ class _EditableProfileScreenState extends State<EditableProfileScreen> {
                   radius: 60,
                   backgroundImage: _image != null
                       ? FileImage(_image!)
-                      : const AssetImage("assets/default_avatar.png") as ImageProvider,
+                      : const AssetImage("assets/jhon.jpg") as ImageProvider,
                 ),
                 IconButton(
                   icon: const Icon(Icons.edit, color: Colors.blue),
