@@ -221,6 +221,21 @@ class LocalAuthService {
   return hashedInput == storedHash;
 }
 
+Future<bool> deleteAccount(String userId) async {
+  final prefs = await SharedPreferences.getInstance();
+  final users = await getAllUsers();
 
+  final index = users.indexWhere((u) => u.id == userId);
+  if (index == -1) return false;
+
+  users.removeAt(index);
+  await _saveAllUsers(users);
+
+  await prefs.remove(currentUserIdKey);
+  await prefs.remove(sessionKey);
+  await prefs.setBool(rememberMeKey, false);
+
+  return true;
+}
 
 }
