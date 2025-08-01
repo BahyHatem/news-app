@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
     return BlocProvider(
       create: (_) => NewsCubit(newsRepository),
       child: MaterialApp(
-        title: 'Auth Form App',
+        title: 'NEWS APP',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.deepPurple,
