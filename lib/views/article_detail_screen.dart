@@ -19,23 +19,30 @@ class ArticleDetailScreen extends StatelessWidget {
             flexibleSpace: FlexibleSpaceBar(
               background: Hero(
   tag: 'article-image-${article.id}',
-  child: CachedNetworkImage(
-    imageUrl: article.imageUrl ?? '',
-    fit: BoxFit.cover,
-    width: double.infinity,
-    height: 250,
-    placeholder: (context, url) => Container(
-      height: 250,
-      color: Colors.grey[300],
-      child: const Center(child: CircularProgressIndicator()),
-    ),
-    errorWidget: (context, url, error) => Container(
-      height: 250,
-      color: Colors.grey[200],
-      child: const Icon(Icons.broken_image, size: 60),
-    ),
-  ),
-)
+  child: (article.imageUrl != null && article.imageUrl!.isNotEmpty)
+      ? CachedNetworkImage(
+          imageUrl: article.imageUrl!,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: 250,
+          placeholder: (context, url) => Container(
+            height: 250,
+            color: Colors.grey[300],
+            child: const Center(child: CircularProgressIndicator()),
+          ),
+          errorWidget: (context, url, error) => Container(
+            height: 250,
+            color: Colors.grey[200],
+            child: const Icon(Icons.broken_image, size: 60),
+          ),
+        )
+      : Container(
+          height: 250,
+          width: double.infinity,
+          color: Colors.grey[300],
+          child: const Icon(Icons.image_not_supported, size: 60),
+        ),
+),
 
             ),
           ),

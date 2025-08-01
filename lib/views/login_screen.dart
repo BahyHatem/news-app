@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../views/forget_password_screen.dart';
 import '../views/register_screen.dart';
 import '../models/user_model.dart';
 import '../services/local_auth_service.dart';
 import '../views/home_screen.dart';
+import '../cubits/news_cubit.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -73,9 +75,16 @@ class _LoginScreenState extends State<LoginScreen> {
       const SnackBar(content: Text('Login successful!')),
     );
 
-   Navigator.of(context).pushReplacement(
-  MaterialPageRoute(builder: (_) => HomeScreen(currentUser: user)),
+   Navigator.pushReplacement(
+  context,
+  MaterialPageRoute(
+    builder: (context) => BlocProvider.value(
+      value: context.read<NewsCubit>(),
+      child: HomeScreen(currentUser: user),
+    ),
+  ),
 );
+
   } else {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Invalid email or password')),

@@ -14,8 +14,8 @@ class NewsAPIService {
   final SharedPreferences _prefs;
   
 
-  NewsAPIService({Dio? dio, SharedPreferences? prefs})
-      : _prefs = prefs ?? SharedPreferences.getInstance() as SharedPreferences {
+  NewsAPIService({Dio? dio, required SharedPreferences prefs})
+      : _prefs = prefs{
     _dio = dio ?? Dio(BaseOptions(
       baseUrl: _baseUrl,
       connectTimeout: _timeout,

@@ -74,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
       title: Row(
         children: [
           CircleAvatar(
-            backgroundImage: NetworkImage(user.profileImage ?? ''),
+            backgroundImage: AssetImage("assets/g.jpg"),
             radius: 18,
           ),
           const SizedBox(width: 10),
@@ -83,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "$greeting, ${user.firstName.split(' ').first} 👋",
+                  "$greeting, ${user.firstName.split(' ').first} ",
                   style: const TextStyle(fontSize: 16),
                 ),
                 Row(
@@ -153,9 +153,24 @@ class _HomeScreenState extends State<HomeScreen> {
               accountName: Text(user.firstName),
               accountEmail: Text(user.email),
               currentAccountPicture: CircleAvatar(
-                backgroundImage: NetworkImage(user.profileImage ?? ''),
+                backgroundImage:  AssetImage("assets/g.jpg"),
               ),
             ),
+            ListTile(
+  leading: const Icon(Icons.person),
+  title: const Text('My Profile'),
+  onTap: () {
+    Navigator.pushNamed(context, '/profile');
+  },
+),
+ListTile(
+  leading: const Icon(Icons.edit),
+  title: const Text('Edit Profile'),
+  onTap: () {
+    Navigator.pushNamed(context, '/edit_profile');
+  },
+),
+
             ListTile(
               leading: const Icon(Icons.bookmark),
               title: const Text('Bookmarks'),
@@ -197,32 +212,37 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              scrollDirection: Axis.horizontal,
-              itemCount: Category.defaultCategories().length,
-              itemBuilder: (context, index) {
-                final category = Category.defaultCategories()[index];
-                final isSelected = category.id == selectedCategory.id;
-
-                return ChoiceChip(
-                  label: Text(category.displayName),
-                  avatar: Icon(category.icon, size: 18),
-                  selected: isSelected,
-                  selectedColor: category.color,
-                  onSelected: (_) {
-                    setState(() {
-                      selectedCategory = category;
-                      
-                    });
+            SizedBox(
+              height: 50,
+              child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: Category.defaultCategories().length,
+                  itemBuilder: (context, index) {
+                    final category = Category.defaultCategories()[index];
+                    final isSelected = category.id == selectedCategory.id;
+                
+                    return ChoiceChip(
+                      label: Text(category.displayName),
+                      avatar: Icon(category.icon, size: 18),
+                      selected: isSelected,
+                      selectedColor: category.color,
+                      onSelected: (_) {
+                        setState(() {
+                          selectedCategory = category;
+                          
+                        });
+                         _loadNews();
+                      },
+                      labelStyle: TextStyle(
+                        color: isSelected ? Colors.white : Colors.black,
+                      ),
+                      backgroundColor: Colors.grey[200],
+                    );
                   },
-                  labelStyle: TextStyle(
-                    color: isSelected ? Colors.white : Colors.black,
-                  ),
-                  backgroundColor: Colors.grey[200],
-                );
-              },
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
+                  separatorBuilder: (_, __) => const SizedBox(width: 8),
+                ),
+              
             ),
             const SizedBox(height: 10),
             Expanded(
@@ -237,7 +257,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     return ListView.builder(
                       itemCount: state.articles.length,
                       itemBuilder: (context, index) {
-                        return NewsCard(article: state.articles[index]);
+                        return GestureDetector(
+  onTap: () {
+    Navigator.pushNamed(
+      context,
+      '/article_details',
+      arguments: state.articles[index],
+    );
+  },
+  child: NewsCard(article: state.articles[index]),
+);
+
                       },
                     );
                   } else if (state is NewsError) {
@@ -250,11 +280,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pushNamed(context, '/search'),
-        child: const Icon(Icons.search),
-      ),
+      
+    )
     );
   }
 }

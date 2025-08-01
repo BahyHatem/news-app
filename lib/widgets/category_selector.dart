@@ -1,4 +1,4 @@
-// file: widgets/category_selector.dart
+
 import 'package:flutter/material.dart';
 import '../models/category_model.dart';
 

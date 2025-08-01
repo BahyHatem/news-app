@@ -14,8 +14,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final picker = ImagePicker();
 
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _nameController = TextEditingController(text: "John Doe");
-  final TextEditingController _emailController = TextEditingController(text: "john@example.com");
+  final TextEditingController _nameController = TextEditingController(text: "bahy");
+  final TextEditingController _emailController = TextEditingController(text: "bahy@gmail.com");
   final TextEditingController _phoneController = TextEditingController(text: "+201234567890");
 
   Future<void> _pickImage() async {
@@ -49,7 +49,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   radius: 60,
                   backgroundImage: _image != null
                       ? FileImage(_image!)
-                      : const AssetImage("assets/jhon.jpg") as ImageProvider,
+                      : const AssetImage("assets/g.jpg") as ImageProvider,
                 ),
                 IconButton(
                   icon: const Icon(Icons.edit, color: Colors.blue),
